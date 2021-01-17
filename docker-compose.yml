@@ -31,17 +31,17 @@ services:
     ports:
       - "6379:6379"
 
-  camera-agent1:
-    image: 'camera-agent:0.0.1-SNAPSHOT'
-    ports:
-      - "8005:8005"
-    environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
-      SPRING_PROFILES_ACTIVE: camera-agent1
-    container_name: camera-agent1
-    links:
-      - discovery-service1
-      - discovery-service2
+#  camera-agent1:
+#    image: 'camera-agent:0.0.1-SNAPSHOT'
+#    ports:
+#      - "8005:8005"
+#    environment:
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+#      SPRING_PROFILES_ACTIVE: camera-agent1
+#    container_name: camera-agent1
+#    links:
+#      - discovery-service1
+#      - discovery-service2
 
 #  camera-agent2:
 #    image: 'camera-agent:0.0.1-SNAPSHOT'
@@ -58,22 +58,22 @@ services:
 #      - discovery-service1
 #      - discovery-service2
 
-  camera-service1:
-    image: 'camera-service:0.0.1-SNAPSHOT'
-    ports:
-      - "8011:8011"
-    environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
-      SPRING_PROFILES_ACTIVE: camera-service1
-      MONGO_URL: mongodb://mongo:27017/cameradata
-      REDIS_URL: redis://redis:6379
-    container_name: camera-service1
-    links:
-      - kafka:kafka
-      - mongo
-      - redis
-      - discovery-service1
-      - discovery-service2
+#  camera-service1:
+#    image: 'camera-service:0.0.1-SNAPSHOT'
+#    ports:
+#      - "8011:8011"
+#    environment:
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+#      SPRING_PROFILES_ACTIVE: camera-service1
+#      MONGO_URL: mongodb://mongo:27017/cameradata
+#      REDIS_URL: redis://redis:6379
+#    container_name: camera-service1
+#    links:
+#      - kafka:kafka
+#      - mongo
+#      - redis
+#      - discovery-service1
+#      - discovery-service2
 
 #  camera-service2:
 #    image: 'camera-service:0.0.1-SNAPSHOT'
@@ -86,6 +86,7 @@ services:
 #      REDIS_URL: redis://redis:6379
 #    container_name: camera-service2
 #    links:
+#      - kafka:kafka
 #      - mongo
 #      - redis
 #      - discovery-service1
@@ -146,16 +147,16 @@ services:
       - discovery-service1
       - discovery-service2
 
-#  user-service2:
-#    image: 'user-service:0.0.1-SNAPSHOT'
-#    environment:
-#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
-#      MONGO_URL: mongodb://mongo:27017/user
-#    container_name: user-service2
-#    links:
-#      - mongo
-#      - discovery-service1
-#      - discovery-service2
+  user-service2:
+    image: 'user-service:0.0.1-SNAPSHOT'
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+      MONGO_URL: mongodb://mongo:27017/user
+    container_name: user-service2
+    links:
+      - mongo
+      - discovery-service1
+      - discovery-service2
 
   gateway-service1:
     image: 'gateway-service:0.0.1-SNAPSHOT'
