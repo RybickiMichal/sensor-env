@@ -1,0 +1,224 @@
+version: '3.8'
+services:
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_CREATE_TOPICS: "camera-sensors:12:1,rf-sensors:12:1,rf-data:12:1,camera-data:12:1"
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  camera-agent1:
+    image: 'camera-agent:0.0.1-SNAPSHOT'
+    ports:
+      - "8005:8005"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+      SPRING_PROFILES_ACTIVE: camera-agent1
+    container_name: camera-agent1
+    links:
+      - discovery-service1
+      - discovery-service2
+
+#  camera-agent2:
+#    image: 'camera-agent:0.0.1-SNAPSHOT'
+#    ports:
+#      - "8006:8006"
+#    environment:
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+#      SPRING_PROFILES_ACTIVE: camera-agent2
+#    container_name: camera-agent2
+#    depends_on:
+#      - discovery-service1
+#      - discovery-service2
+#    links:
+#      - discovery-service1
+#      - discovery-service2
+
+  camera-service1:
+    image: 'camera-service:0.0.1-SNAPSHOT'
+    ports:
+      - "8011:8011"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+      SPRING_PROFILES_ACTIVE: camera-service1
+      MONGO_URL: mongodb://mongo:27017/cameradata
+      REDIS_URL: redis://redis:6379
+    container_name: camera-service1
+    links:
+      - kafka:kafka
+      - mongo
+      - redis
+      - discovery-service1
+      - discovery-service2
+
+#  camera-service2:
+#    image: 'camera-service:0.0.1-SNAPSHOT'
+#    ports:
+#      - "8012:8012"
+#    environment:
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+#      SPRING_PROFILES_ACTIVE: camera-service2
+#      MONGO_URL: mongodb://mongo:27017/cameradata
+#      REDIS_URL: redis://redis:6379
+#    container_name: camera-service2
+#    links:
+#      - mongo
+#      - redis
+#      - discovery-service1
+#      - discovery-service2
+
+#  rf-agent1:
+#    image: 'rf-agent:0.0.1-SNAPSHOT'
+#    environment:
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+#    container_name: rf-agent1
+#    links:
+#      - discovery-service1
+#      - discovery-service2
+
+#  rf-agent2:
+#    image: 'rf-agent:0.0.1-SNAPSHOT'
+#    environment:
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+#    container_name: rf-agent2
+#    links:
+#      - discovery-service1
+#      - discovery-service2
+
+#  rf-service1:
+#    image: 'rf-service:0.0.1-SNAPSHOT'
+#    environment:
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+#      MONGO_URL: mongodb://mongo:27017/rfdata
+#    container_name: rf-service1
+#    links:
+#      - kafka:kafka
+#      - mongo
+#      - redis
+#      - discovery-service1
+#      - discovery-service2
+
+#  rf-service2:
+#    image: 'rf-service:0.0.1-SNAPSHOT'
+#    environment:
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+#      MONGO_URL: mongodb://mongo:27017/rfdata
+#      REDIS_URL: redis://redis:6379
+#    container_name: rf-service2
+#    links:
+#      - mongo
+#      - redis
+#      - discovery-service1
+#      - discovery-service2
+
+  user-service1:
+    image: 'user-service:0.0.1-SNAPSHOT'
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+      MONGO_URL: mongodb://mongo:27017/user
+    container_name: user-service1
+    links:
+      - mongo
+      - discovery-service1
+      - discovery-service2
+
+#  user-service2:
+#    image: 'user-service:0.0.1-SNAPSHOT'
+#    environment:
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+#      MONGO_URL: mongodb://mongo:27017/user
+#    container_name: user-service2
+#    links:
+#      - mongo
+#      - discovery-service1
+#      - discovery-service2
+
+  gateway-service1:
+    image: 'gateway-service:0.0.1-SNAPSHOT'
+    ports:
+      - "8003:8003"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+      SPRING_PROFILES_ACTIVE: gateway-1
+    container_name: gateway-service1
+    links:
+      - discovery-service1
+      - discovery-service2
+
+  gateway-service2:
+    image: 'gateway-service:0.0.1-SNAPSHOT'
+    ports:
+      - "8004:8004"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+      SPRING_PROFILES_ACTIVE: gateway-2
+    container_name: gateway-service2
+    links:
+      - discovery-service1
+      - discovery-service2
+
+  sensor-service1:
+    image: 'sensor-service:0.0.1-SNAPSHOT'
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+      MONGO_URL: mongodb://mongo:27017/sensors
+    container_name: sensor-service1
+    links:
+      - kafka:kafka
+      - mongo
+      - discovery-service1
+      - discovery-service2
+
+  sensor-service2:
+    image: 'sensor-service:0.0.1-SNAPSHOT'
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service1:8001/eureka,http://discovery-service2:8002/eureka
+      MONGO_URL: mongodb://mongo:27017/sensors
+    container_name: sensor-service2
+    links:
+      - kafka:kafka
+      - mongo
+      - discovery-service1
+      - discovery-service2
+
+  discovery-service1:
+    image: 'discovery-service:0.0.1-SNAPSHOT'
+    ports:
+      - "8001:8001"
+    environment:
+      SPRING_PROFILES_ACTIVE: eureka-1
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service2:8002/eureka
+    container_name: discovery-service1
+
+  discovery-service2:
+    image: 'discovery-service:0.0.1-SNAPSHOT'
+    ports:
+      - "8002:8002"
+    environment:
+      SPRING_PROFILES_ACTIVE: eureka-2
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service2:8002/eureka
+    container_name: discovery-service2

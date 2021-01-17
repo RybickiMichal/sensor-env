@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/camera-agent/camera-agent.iml" filepath="$PROJECT_DIR$/camera-agent/camera-agent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/camera-service/camera-service.iml" filepath="$PROJECT_DIR$/camera-service/camera-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/discovery-service/discovery-service.iml" filepath="$PROJECT_DIR$/discovery-service/discovery-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gateway-service/gateway-service.iml" filepath="$PROJECT_DIR$/gateway-service/gateway-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rf-agent/rf-agent.iml" filepath="$PROJECT_DIR$/rf-agent/rf-agent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rf-service/rf-service.iml" filepath="$PROJECT_DIR$/rf-service/rf-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/sensor-env.iml" filepath="$PROJECT_DIR$/.idea/sensor-env.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sensor-service/sensor-service.iml" filepath="$PROJECT_DIR$/sensor-service/sensor-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/user-service/user-service.iml" filepath="$PROJECT_DIR$/user-service/user-service.iml" />
+    </modules>
+  </component>
+</project>
