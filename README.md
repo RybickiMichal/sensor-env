@@ -16,22 +16,34 @@ gateway.url=http://{here write your IP}:8003/
 ```
 "mvn spring-boot:build-image"
 ```
-<b>3.</b> Run all environment (two instances of each app) using docker compose
+<b>3.</b> Run all environment using docker compose (there are two instances of each app)
 
 <b>4.</b> Applications will automatically register to eureka. 
 
-<b>5.1.</b> RF-Agent will register(if not already registered yet) and authenticate to user-service. Nextly will register to sensor-service and start send data to rf-service.
+<b>5.1.</b> RF-agents will register and authenticate to user-service. Then will register to sensor-service and start send data to gateway-service.
 
-<b>5.2.</b> To register camera-agent you must do it yourself. You should Register user and authenticate. With token you will be able to register camera-agent. Remember about Authorization header: 
+<b>5.2.1.</b> For register camera agents you must first create account. To do that use register endpoint: 
 ```
-"Authorization" "Bearer (token_value)".
+POST localhost:8003/camera/register  
+{
+    "userName":"name@gmail.com",
+    "password":"password",
+    "roles":[
+        "CameraRegistrationRole"
+    ]
+}
+```
+<b>5.2.2.</b> Then you will be able to authenticate and receive token
+```
+POST localhost:8003/authenticate
+{
+    "userName":"name@gmail.com",
+    "password":"password"
+}
 ``` 
-To register use endpoint POST 
+<b>5.2.3.</b> Previously generated token will be needed to register camera sensors(agents). Add Header Authorization with value "Bearer + {token}"
 ```
-localhost:8003/camera/register  
-```
-and appropriate body. For example:
-```
+POST 
 {
     "streamAddress":"112.223.222.22",
     "panTiltZoom":{"pan":222,"tilt":117,"zoom":8},
@@ -39,4 +51,4 @@ and appropriate body. For example:
     "ip":"(here write your IP):(here write port of camera agent - 8005 or 8006)"
 }
 ```
-<b>6.</b> all the time, data will be generated, sent, saved in the database and sent to the appropriate kafka topic
+<b>6.</b> All the time, data will be generated, sent, saved in the database and sent to the appropriate kafka topic
