@@ -43,7 +43,7 @@ POST localhost:8003/authenticate
 ``` 
 <b>5.2.3.</b> Previously generated token will be needed to register camera sensors(agents). Add Header Authorization with value "Bearer + {token}"
 ```
-POST 
+POST localhost:8003/camera/register
 {
     "streamAddress":"112.223.222.22",
     "panTiltZoom":{"pan":222,"tilt":117,"zoom":8},
